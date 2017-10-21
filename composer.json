@@ -1,0 +1,34 @@
+{
+  "name": "fusio/adapter-fcgi",
+  "description": "Adapter to call a FastCGI endpoint",
+  "homepage": "http://fusio-project.org",
+  "keywords": ["fusio-adapter"],
+  "license": "AGPL-3.0",
+  "authors": [
+    {
+      "name": "Christoph Kappestein",
+      "email": "christoph.kappestein@gmail.com",
+      "homepage": "http://christoph.kappestein.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "fusio/engine": "^1.0",
+    "hoa/fastcgi": "~3.0",
+    "hoa/socket": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.6",
+    "phpunit/dbunit": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Fusio\\Adapter\\Fcgi\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Fusio\\Adapter\\Fcgi\\Tests\\": "tests/"
+    }
+  }
+}
