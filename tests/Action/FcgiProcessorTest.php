@@ -77,7 +77,7 @@ class FcgiProcessorTest extends \PHPUnit_Framework_TestCase
 JSON;
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode(), $actual);
         $this->assertEquals(['x-powered-by' => 'PHP/' . PHP_VERSION, 'content-type' => 'application/json'], $response->getHeaders());
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }

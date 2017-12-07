@@ -105,7 +105,7 @@ JSON;
         $expect = 'foobar';
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode(), $actual);
         $this->assertEquals(['x-powered-by' => 'PHP/' . PHP_VERSION, 'content-type' => 'text/html; charset=UTF-8'], $response->getHeaders());
         $this->assertEquals($expect, $actual, $actual);
     }
