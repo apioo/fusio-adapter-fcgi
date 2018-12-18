@@ -25,8 +25,14 @@ use Fusio\Engine\ActionAbstract;
 use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
 use Fusio\Engine\RequestInterface;
-use Hoa\Fastcgi\Responder;
-use Hoa\Socket\Client;
+use hollodotme\FastCGI\Client;
+use hollodotme\FastCGI\Requests\DeleteRequest;
+use hollodotme\FastCGI\Requests\GetRequest;
+use hollodotme\FastCGI\Requests\PatchRequest;
+use hollodotme\FastCGI\Requests\PostRequest;
+use hollodotme\FastCGI\Requests\PutRequest;
+use hollodotme\FastCGI\SocketConnections\NetworkSocket;
+use hollodotme\FastCGI\SocketConnections\UnixDomainSocket;
 use PSX\Http\MediaType;
 
 /**
@@ -41,22 +47,33 @@ class FcgiEngine extends ActionAbstract
     /**
      * @var string
      */
-    protected $socket;
+    protected $host;
+
+    /**
+     * @var integer
+     */
+    protected $port;
 
     /**
      * @var string
      */
     protected $script;
 
-    public function __construct($socket = null, $script = null)
+    public function __construct($host = null, $port = null, $script = null)
     {
-        $this->socket = $socket;
+        $this->host   = $host;
+        $this->port   = $port;
         $this->script = $script;
     }
 
-    public function setSocket($socket)
+    public function setHost($host)
     {
-        $this->socket = $socket;
+        $this->host = $host;
+    }
+
+    public function setPort($port)
+    {
+        $this->port = $port;
     }
 
     public function setScript($script)
@@ -66,50 +83,32 @@ class FcgiEngine extends ActionAbstract
 
     public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context)
     {
-        $headers = [
-            'REQUEST_METHOD'  => $request->getMethod(),
-            'REQUEST_URI'     => '/',
-            'SCRIPT_FILENAME' => $this->script,
-            'CONTENT_TYPE'    => 'application/json',
-            'REMOTE_ADDR'     => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1',
-            'REMOTE_USER'     => $context->getUser()->getName(),
-
-            'ROUTE_ID'        => $context->getRouteId(),
-            'USER_ANONYMOUS'  => $context->getUser()->isAnonymous() ? '1' : '0',
-            'USER_ID'         => $context->getUser()->getId(),
-            'APP_ID'          => $context->getApp()->getId(),
-            'APP_KEY'         => $context->getApp()->getAppKey(),
-        ];
-
-        if (!$context->getUser()->isAnonymous()) {
-            $headers['AUTH_TYPE'] = 'Bearer';
-        }
-
-        $fastcgi = new Responder(new Client($this->socket));
-        $fastcgi->send($headers, json_encode($request->getBody()));
-
-        $headers = $fastcgi->getResponseHeaders();
-        $content = $fastcgi->getResponseContent();
-
-        if (isset($headers['status'])) {
-            $parts = explode(' ', $headers['status']);
-            $code  = intval($parts[0]);
+        if (empty($this->port)) {
+            $connection = new UnixDomainSocket($this->host);
         } else {
-            $code  = 200;
+            $connection = new NetworkSocket($this->host, $this->port);
         }
 
-        $contentType = isset($headers['content-type']) ? $headers['content-type'] : null;
-        if ($this->isJson($contentType)) {
-            $body = json_decode($content);
-        } else {
-            $body = $content;
+        $client   = new Client($connection);
+        $request  = $this->newRequest($request->getMethod(), $this->script, \json_encode($request->getBody()), $context);
+        $response = $client->sendRequest($request);
+
+        $headers = $response->getHeaders();
+        $headers = array_change_key_case($headers);
+        $body    = $response->getBody();
+
+        $contentType = $headers['content-type'] ?? null;
+        if (!empty($contentType)) {
+            if ($this->isJson($contentType)) {
+                $body = \json_decode($body);
+            }
         }
 
-        return $this->response->build(
-            $code,
-            $headers,
-            $body
-        );
+        if (isset($headers['x-powered-by'])) {
+            unset($headers['x-powered-by']);
+        }
+
+        return $this->response->build(200, $headers, $body);
     }
 
     private function isJson($contentType)
@@ -122,5 +121,50 @@ class FcgiEngine extends ActionAbstract
         }
 
         return false;
+    }
+
+    private function newRequest($method, $script, $body, ContextInterface $context)
+    {
+        switch ($method) {
+            case 'DELETE':
+                $request = new DeleteRequest($script, $body);
+                break;
+
+            case 'GET':
+                $request = new GetRequest($script, $body);
+                break;
+
+            case 'PATCH':
+                $request = new PatchRequest($script, $body);
+                break;
+
+            case 'POST':
+                $request = new PostRequest($script, $body);
+                break;
+
+            case 'PUT':
+                $request = new PutRequest($script, $body);
+                break;
+
+            default:
+                throw new \RuntimeException('Invalid request method');
+                break;
+        }
+
+        $request->setRequestUri('/');
+        $request->setContentType('application/json');
+        $request->setRemoteAddress($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+        $request->setCustomVar('REMOTE_USER', $context->getUser()->getName());
+        $request->setCustomVar('ROUTE_ID', $context->getRouteId());
+        $request->setCustomVar('USER_ANONYMOUS', $context->getUser()->isAnonymous() ? '1' : '0');
+        $request->setCustomVar('USER_ID', $context->getUser()->getId());
+        $request->setCustomVar('APP_ID', $context->getApp()->getId());
+        $request->setCustomVar('APP_KEY', $context->getApp()->getAppKey());
+
+        if (!$context->getUser()->isAnonymous()) {
+            $request->setCustomVar('AUTH_TYPE', 'Bearer');
+        }
+
+        return $request;
     }
 }

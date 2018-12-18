@@ -43,7 +43,8 @@ class FcgiProcessor extends FcgiEngine
 
     public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context)
     {
-        $this->setSocket($configuration->get('socket'));
+        $this->setHost($configuration->get('host'));
+        $this->setPort($configuration->get('port'));
         $this->setScript($configuration->get('script'));
 
         return parent::handle($request, $configuration, $context);
@@ -51,7 +52,8 @@ class FcgiProcessor extends FcgiEngine
 
     public function configure(BuilderInterface $builder, ElementFactoryInterface $elementFactory)
     {
-        $builder->add($elementFactory->newInput('socket', 'Socket', 'text', 'The socket of the FastCGI server i.e. <code>tcp://127.0.0.1:9000</code>'));
+        $builder->add($elementFactory->newInput('host', 'Host', 'text', 'Hostname or path to a socket'));
+        $builder->add($elementFactory->newInput('port', 'Port', 'text', 'The port of the server if a hostname was provided'));
         $builder->add($elementFactory->newInput('script', 'Script', 'text', 'The script which should be executed by the server'));
     }
 }
