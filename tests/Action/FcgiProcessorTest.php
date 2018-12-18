@@ -25,6 +25,7 @@ use Fusio\Adapter\Fcgi\Action\FcgiProcessor;
 use Fusio\Engine\Form\Builder;
 use Fusio\Engine\Form\Container;
 use Fusio\Engine\Test\EngineTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use PSX\Http\Environment\HttpResponseInterface;
 
 /**
@@ -34,7 +35,7 @@ use PSX\Http\Environment\HttpResponseInterface;
  * @license http://www.gnu.org/licenses/agpl-3.0
  * @link    http://fusio-project.org
  */
-class FcgiProcessorTest extends \PHPUnit_Framework_TestCase
+class FcgiProcessorTest extends TestCase
 {
     use EngineTestCaseTrait;
 
@@ -52,7 +53,7 @@ class FcgiProcessorTest extends \PHPUnit_Framework_TestCase
         // handle request
         $response = $action->handle(
             $this->getRequest('GET'),
-            $this->getParameters(['socket' => 'tcp://127.0.0.1:9090', 'script' => 'json.php']),
+            $this->getParameters(['host' => '127.0.0.1', 'port' => 9090, 'script' => 'json.php']),
             $this->getContext()
         );
 
@@ -78,7 +79,7 @@ JSON;
 
         $this->assertInstanceOf(HttpResponseInterface::class, $response);
         $this->assertEquals(200, $response->getStatusCode(), $actual);
-        $this->assertEquals(['x-powered-by' => 'PHP/' . PHP_VERSION, 'content-type' => 'application/json'], $response->getHeaders());
+        $this->assertEquals(['content-type' => 'application/json'], $response->getHeaders());
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
 

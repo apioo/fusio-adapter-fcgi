@@ -25,6 +25,7 @@ use Fusio\Adapter\Fcgi\Action\FcgiEngine;
 use Fusio\Engine\Form\Builder;
 use Fusio\Engine\Form\Container;
 use Fusio\Engine\Test\EngineTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use PSX\Http\Environment\HttpResponseInterface;
 
 /**
@@ -34,7 +35,7 @@ use PSX\Http\Environment\HttpResponseInterface;
  * @license http://www.gnu.org/licenses/agpl-3.0
  * @link    http://fusio-project.org
  */
-class FcgiEngineTest extends \PHPUnit_Framework_TestCase
+class FcgiEngineTest extends TestCase
 {
     use EngineTestCaseTrait;
 
@@ -49,7 +50,8 @@ class FcgiEngineTest extends \PHPUnit_Framework_TestCase
 
         /** @var FcgiEngine $action */
         $action = $this->getActionFactory()->factory(FcgiEngine::class);
-        $action->setSocket('tcp://127.0.0.1:9090');
+        $action->setHost('127.0.0.1');
+        $action->setPort(9090);
         $action->setScript('json.php');
 
         // handle request
@@ -81,7 +83,7 @@ JSON;
 
         $this->assertInstanceOf(HttpResponseInterface::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['x-powered-by' => 'PHP/' . PHP_VERSION, 'content-type' => 'application/json'], $response->getHeaders());
+        $this->assertEquals(['content-type' => 'application/json'], $response->getHeaders());
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
 
@@ -91,7 +93,8 @@ JSON;
 
         /** @var FcgiEngine $action */
         $action = $this->getActionFactory()->factory(FcgiEngine::class);
-        $action->setSocket('tcp://127.0.0.1:9090');
+        $action->setHost('127.0.0.1');
+        $action->setPort(9090);
         $action->setScript('html.php');
 
         // handle request
@@ -106,7 +109,7 @@ JSON;
 
         $this->assertInstanceOf(HttpResponseInterface::class, $response);
         $this->assertEquals(200, $response->getStatusCode(), $actual);
-        $this->assertEquals(['x-powered-by' => 'PHP/' . PHP_VERSION, 'content-type' => 'text/html; charset=UTF-8'], $response->getHeaders());
+        $this->assertEquals(['content-type' => 'text/html;charset=UTF-8'], $response->getHeaders());
         $this->assertEquals($expect, $actual, $actual);
     }
 
