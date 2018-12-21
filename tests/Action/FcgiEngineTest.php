@@ -48,11 +48,13 @@ class FcgiEngineTest extends TestCase
     {
         $this->pingFastCGIServer();
 
+        $script = realpath(__DIR__ . '/../json.php');
+
         /** @var FcgiEngine $action */
         $action = $this->getActionFactory()->factory(FcgiEngine::class);
         $action->setHost('127.0.0.1');
         $action->setPort(9090);
-        $action->setScript('json.php');
+        $action->setScript($script);
 
         // handle request
         $response = $action->handle(
@@ -62,13 +64,14 @@ class FcgiEngineTest extends TestCase
         );
 
         $actual = json_encode($response->getBody(), JSON_PRETTY_PRINT);
+        $script = json_encode($script);
         $expect = <<<JSON
 {
     "foo": "bar",
     "server": {
         "REQUEST_METHOD": "GET",
-        "REQUEST_URI": "\/",
-        "SCRIPT_FILENAME": "json.php",
+        "REQUEST_URI": "",
+        "SCRIPT_FILENAME": {$script},
         "CONTENT_TYPE": "application\/json",
         "REMOTE_ADDR": "127.0.0.1",
         "REMOTE_USER": "Consumer",
@@ -95,7 +98,7 @@ JSON;
         $action = $this->getActionFactory()->factory(FcgiEngine::class);
         $action->setHost('127.0.0.1');
         $action->setPort(9090);
-        $action->setScript('html.php');
+        $action->setScript(realpath(__DIR__ . '/../html.php'));
 
         // handle request
         $response = $action->handle(

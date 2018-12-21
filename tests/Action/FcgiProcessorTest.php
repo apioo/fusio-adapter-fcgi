@@ -49,22 +49,24 @@ class FcgiProcessorTest extends TestCase
         $this->pingFastCGIServer();
 
         $action = $this->getActionFactory()->factory(FcgiProcessor::class);
+        $script = realpath(__DIR__ . '/../json.php');
 
         // handle request
         $response = $action->handle(
             $this->getRequest('GET'),
-            $this->getParameters(['host' => '127.0.0.1', 'port' => 9090, 'script' => 'json.php']),
+            $this->getParameters(['host' => '127.0.0.1', 'port' => 9090, 'script' => $script]),
             $this->getContext()
         );
 
         $actual = json_encode($response->getBody(), JSON_PRETTY_PRINT);
+        $script = json_encode($script);
         $expect = <<<JSON
 {
     "foo": "bar",
     "server": {
         "REQUEST_METHOD": "GET",
-        "REQUEST_URI": "\/",
-        "SCRIPT_FILENAME": "json.php",
+        "REQUEST_URI": "",
+        "SCRIPT_FILENAME": {$script},
         "CONTENT_TYPE": "application\/json",
         "REMOTE_ADDR": "127.0.0.1",
         "REMOTE_USER": "Consumer",
