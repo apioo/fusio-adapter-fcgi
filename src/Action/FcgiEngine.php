@@ -97,6 +97,12 @@ class FcgiEngine extends ActionAbstract
         $headers = array_change_key_case($headers);
         $body    = $response->getBody();
 
+        $code = 200;
+        if (isset($headers['status'])) {
+            $code = (int) strstr($headers['status'], ' ', true);
+            unset($headers['status']);
+        }
+
         $contentType = $headers['content-type'] ?? null;
         if (!empty($contentType)) {
             if ($this->isJson($contentType)) {
@@ -108,7 +114,7 @@ class FcgiEngine extends ActionAbstract
             unset($headers['x-powered-by']);
         }
 
-        return $this->response->build(200, $headers, $body);
+        return $this->response->build($code, $headers, $body);
     }
 
     private function isJson($contentType)
