@@ -31,8 +31,7 @@ use hollodotme\FastCGI\Requests\GetRequest;
 use hollodotme\FastCGI\Requests\PatchRequest;
 use hollodotme\FastCGI\Requests\PostRequest;
 use hollodotme\FastCGI\Requests\PutRequest;
-use hollodotme\FastCGI\SocketConnections\NetworkSocket;
-use hollodotme\FastCGI\SocketConnections\UnixDomainSocket;
+use hollodotme\FastCGI\SocketConnections;
 use PSX\Http\MediaType;
 
 /**
@@ -84,9 +83,9 @@ class FcgiEngine extends ActionAbstract
     public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context)
     {
         if (empty($this->port)) {
-            $connection = new UnixDomainSocket($this->host);
+            $connection = new SocketConnections\UnixDomainSocket($this->host);
         } else {
-            $connection = new NetworkSocket($this->host, $this->port);
+            $connection = new SocketConnections\NetworkSocket($this->host, $this->port);
         }
 
         $client   = new Client($connection);
@@ -157,7 +156,6 @@ class FcgiEngine extends ActionAbstract
                 break;
         }
 
-        $request->setRequestUri('/');
         $request->setContentType('application/json');
         $request->setRemoteAddress($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
         $request->setCustomVar('REMOTE_USER', $context->getUser()->getName());
