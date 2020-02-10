@@ -88,9 +88,9 @@ class FcgiEngine extends ActionAbstract
             $connection = new SocketConnections\NetworkSocket($this->host, $this->port);
         }
 
-        $client   = new Client($connection);
+        $client   = new Client();
         $request  = $this->newRequest($request->getMethod(), $this->script, \json_encode($request->getBody()), $context);
-        $response = $client->sendRequest($request);
+        $response = $client->sendRequest($connection, $request);
 
         $headers = $response->getHeaders();
         $headers = array_change_key_case($headers);
