@@ -96,6 +96,10 @@ class FcgiEngine extends ActionAbstract
         $headers = array_change_key_case($headers);
         $body    = $response->getBody();
 
+        $headers = array_map(static function($value) {
+            return is_array($value) ? implode(', ', $value) : $value;
+        }, $headers);
+
         $code = 200;
         if (isset($headers['status'])) {
             $code = (int) strstr($headers['status'], ' ', true);
