@@ -3,7 +3,7 @@
  * Fusio
  * A web-application to create dynamically RESTful APIs
  *
- * Copyright (C) 2015-2018 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (C) 2015-2022 Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
 use Fusio\Engine\RequestInterface;
 use hollodotme\FastCGI\Client;
+use hollodotme\FastCGI\Requests\AbstractRequest;
 use hollodotme\FastCGI\Requests\DeleteRequest;
 use hollodotme\FastCGI\Requests\GetRequest;
 use hollodotme\FastCGI\Requests\PatchRequest;
@@ -39,43 +40,32 @@ use PSX\Http\MediaType;
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.gnu.org/licenses/agpl-3.0
- * @link    http://fusio-project.org
+ * @link    https://www.fusio-project.org/
  */
 class FcgiEngine extends ActionAbstract
 {
-    /**
-     * @var string
-     */
-    protected $host;
+    protected ?string $host;
+    protected ?int $port;
+    protected ?string $script;
 
-    /**
-     * @var integer
-     */
-    protected $port;
-
-    /**
-     * @var string
-     */
-    protected $script;
-
-    public function __construct($host = null, $port = null, $script = null)
+    public function __construct(?string $host = null, ?int $port = null, ?string $script = null)
     {
         $this->host   = $host;
         $this->port   = $port;
         $this->script = $script;
     }
 
-    public function setHost($host)
+    public function setHost(?string $host): void
     {
         $this->host = $host;
     }
 
-    public function setPort($port)
+    public function setPort(?int $port): void
     {
         $this->port = $port;
     }
 
-    public function setScript($script)
+    public function setScript(?string $script): void
     {
         $this->script = $script;
     }
@@ -120,7 +110,7 @@ class FcgiEngine extends ActionAbstract
         return $this->response->build($code, $headers, $body);
     }
 
-    private function isJson($contentType)
+    private function isJson(?string $contentType): bool
     {
         if (!empty($contentType)) {
             try {
@@ -132,7 +122,7 @@ class FcgiEngine extends ActionAbstract
         return false;
     }
 
-    private function newRequest($method, $script, $body, ContextInterface $context)
+    private function newRequest($method, $script, $body, ContextInterface $context): AbstractRequest
     {
         switch ($method) {
             case 'DELETE':
