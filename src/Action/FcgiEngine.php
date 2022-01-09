@@ -33,6 +33,7 @@ use hollodotme\FastCGI\Requests\PatchRequest;
 use hollodotme\FastCGI\Requests\PostRequest;
 use hollodotme\FastCGI\Requests\PutRequest;
 use hollodotme\FastCGI\SocketConnections;
+use PSX\Http\Environment\HttpResponseInterface;
 use PSX\Http\MediaType;
 
 /**
@@ -70,7 +71,7 @@ class FcgiEngine extends ActionAbstract
         $this->script = $script;
     }
 
-    public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context)
+    public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context): HttpResponseInterface
     {
         if (empty($this->port)) {
             $connection = new SocketConnections\UnixDomainSocket($this->host);
