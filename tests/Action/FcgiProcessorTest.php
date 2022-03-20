@@ -63,6 +63,7 @@ class FcgiProcessorTest extends TestCase
         $expect = <<<JSON
 {
     "foo": "bar",
+    "body": {},
     "server": {
         "REQUEST_METHOD": "GET",
         "REQUEST_URI": "",

@@ -2,8 +2,15 @@
 
 header('Content-Type: application/json');
 
+$body = file_get_contents('php://input');
+$data = null;
+if (!empty($body)) {
+    $data = json_decode($body);
+}
+
 $data = [
     'foo' => 'bar',
+    'body' => $data,
     'server' => [
         'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD'],
         'REQUEST_URI' => $_SERVER['REQUEST_URI'],

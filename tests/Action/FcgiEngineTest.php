@@ -27,6 +27,7 @@ use Fusio\Engine\Form\Container;
 use Fusio\Engine\Test\EngineTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use PSX\Http\Environment\HttpResponseInterface;
+use PSX\Record\Record;
 
 /**
  * FcgiEngineTest
@@ -58,7 +59,7 @@ class FcgiEngineTest extends TestCase
 
         // handle request
         $response = $action->handle(
-            $this->getRequest('GET'),
+            $this->getRequest('POST', [], [], [], new Record(['foo' => 'bar'])),
             $this->getParameters(),
             $this->getContext()
         );
@@ -68,8 +69,11 @@ class FcgiEngineTest extends TestCase
         $expect = <<<JSON
 {
     "foo": "bar",
+    "body": {
+        "foo": "bar"
+    },
     "server": {
-        "REQUEST_METHOD": "GET",
+        "REQUEST_METHOD": "POST",
         "REQUEST_URI": "",
         "SCRIPT_FILENAME": {$script},
         "CONTENT_TYPE": "application\/json",
