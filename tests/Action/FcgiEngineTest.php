@@ -22,6 +22,7 @@
 namespace Fusio\Adapter\Fcgi\Tests\Action;
 
 use Fusio\Adapter\Fcgi\Action\FcgiEngine;
+use Fusio\Adapter\Fcgi\Tests\FcgiTestCase;
 use Fusio\Engine\Form\Builder;
 use Fusio\Engine\Form\Container;
 use Fusio\Engine\Test\EngineTestCaseTrait;
@@ -36,15 +37,8 @@ use PSX\Record\Record;
  * @license http://www.gnu.org/licenses/agpl-3.0
  * @link    https://www.fusio-project.org/
  */
-class FcgiEngineTest extends TestCase
+class FcgiEngineTest extends FcgiTestCase
 {
-    use EngineTestCaseTrait;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testHandle()
     {
         $this->pingFastCGIServer();

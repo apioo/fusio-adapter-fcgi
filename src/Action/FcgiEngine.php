@@ -45,16 +45,9 @@ use PSX\Http\MediaType;
  */
 class FcgiEngine extends ActionAbstract
 {
-    protected ?string $host;
-    protected ?int $port;
-    protected ?string $script;
-
-    public function __construct(?string $host = null, ?int $port = null, ?string $script = null)
-    {
-        $this->host   = $host;
-        $this->port   = $port;
-        $this->script = $script;
-    }
+    protected ?string $host = null;
+    protected ?int $port = null;
+    protected ?string $script = null;
 
     public function setHost(?string $host): void
     {
@@ -115,7 +108,7 @@ class FcgiEngine extends ActionAbstract
     {
         if (!empty($contentType)) {
             try {
-                return MediaType\Json::isMediaType(new MediaType($contentType));
+                return MediaType\Json::isMediaType(MediaType::parse($contentType));
             } catch (\InvalidArgumentException $e) {
             }
         }

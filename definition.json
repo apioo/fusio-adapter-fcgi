@@ -1,5 +1,0 @@
-{
-  "actionClass": [
-    "Fusio\\Adapter\\Fcgi\\Action\\FcgiProcessor"
-  ]
-}
