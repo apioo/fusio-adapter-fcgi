@@ -26,6 +26,7 @@ use Fusio\Adapter\Aws\Connection\Aws;
 use Fusio\Adapter\Aws\Generator\AwsLambda;
 use Fusio\Adapter\Beanstalk\Action\BeanstalkPublish;
 use Fusio\Adapter\Beanstalk\Connection\Beanstalk;
+use Fusio\Adapter\Fcgi\Action\FcgiEngine;
 use Fusio\Adapter\Fcgi\Action\FcgiProcessor;
 use Fusio\Engine\Action\Runtime;
 use Fusio\Engine\ConnectorInterface;
@@ -50,6 +51,7 @@ abstract class FcgiTestCase extends TestCase
 
     protected function configure(Runtime $runtime, Container $container): void
     {
+        $container->set(FcgiEngine::class, new FcgiEngine($runtime));
         $container->set(FcgiProcessor::class, new FcgiProcessor($runtime));
     }
 }
