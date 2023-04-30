@@ -24,6 +24,7 @@ namespace Fusio\Adapter\Fcgi\Action;
 use Fusio\Engine\ActionAbstract;
 use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
+use Fusio\Engine\Request\HttpInterface;
 use Fusio\Engine\RequestInterface;
 use hollodotme\FastCGI\Client;
 use hollodotme\FastCGI\Requests\AbstractRequest;
@@ -34,6 +35,7 @@ use hollodotme\FastCGI\Requests\PostRequest;
 use hollodotme\FastCGI\Requests\PutRequest;
 use hollodotme\FastCGI\SocketConnections;
 use PSX\Http\Environment\HttpResponseInterface;
+use PSX\Http\Exception\InternalServerErrorException;
 use PSX\Http\MediaType;
 
 /**
@@ -66,14 +68,23 @@ class FcgiEngine extends ActionAbstract
 
     public function handle(RequestInterface $request, ParametersInterface $configuration, ContextInterface $context): HttpResponseInterface
     {
+        $host = $this->host ?? throw new InternalServerErrorException('No host configured');
+        $script = $this->script ?? throw new InternalServerErrorException('No script configured');
+
         if (empty($this->port)) {
-            $connection = new SocketConnections\UnixDomainSocket($this->host);
+            $connection = new SocketConnections\UnixDomainSocket($host);
         } else {
-            $connection = new SocketConnections\NetworkSocket($this->host, $this->port);
+            $connection = new SocketConnections\NetworkSocket($host, $this->port);
+        }
+
+        if ($request instanceof HttpInterface) {
+            $method = $request->getMethod();
+        } else {
+            $method = 'POST';
         }
 
         $client   = new Client();
-        $request  = $this->newRequest($request->getMethod(), $this->script, \json_encode($request->getBody()), $context);
+        $request  = $this->newRequest($method, $script, \json_encode($request->getPayload()), $context);
         $response = $client->sendRequest($connection, $request);
 
         $headers = $response->getHeaders();
@@ -116,7 +127,7 @@ class FcgiEngine extends ActionAbstract
         return false;
     }
 
-    private function newRequest($method, $script, $body, ContextInterface $context): AbstractRequest
+    private function newRequest(string $method, string $script, string $body, ContextInterface $context): AbstractRequest
     {
         switch ($method) {
             case 'DELETE':
@@ -141,7 +152,6 @@ class FcgiEngine extends ActionAbstract
 
             default:
                 throw new \RuntimeException('Invalid request method');
-                break;
         }
 
         $request->setContentType('application/json');
