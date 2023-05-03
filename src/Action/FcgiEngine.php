@@ -24,7 +24,7 @@ namespace Fusio\Adapter\Fcgi\Action;
 use Fusio\Engine\ActionAbstract;
 use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
-use Fusio\Engine\Request\HttpInterface;
+use Fusio\Engine\Request\HttpRequest;
 use Fusio\Engine\RequestInterface;
 use hollodotme\FastCGI\Client;
 use hollodotme\FastCGI\Requests\AbstractRequest;
@@ -77,8 +77,9 @@ class FcgiEngine extends ActionAbstract
             $connection = new SocketConnections\NetworkSocket($host, $this->port);
         }
 
-        if ($request instanceof HttpInterface) {
-            $method = $request->getMethod();
+        $requestContext = $request->getContext();
+        if ($requestContext instanceof HttpRequest) {
+            $method = $requestContext->getMethod();
         } else {
             $method = 'POST';
         }
