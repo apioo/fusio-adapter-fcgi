@@ -26,6 +26,7 @@ use Fusio\Engine\ActionInterface;
 use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
 use Fusio\Engine\Request\HttpRequest;
+use Fusio\Engine\Request\HttpRequestContext;
 use Fusio\Engine\RequestInterface;
 use Fusio\Engine\Response\FactoryInterface;
 use hollodotme\FastCGI\Client;
@@ -87,8 +88,8 @@ class FcgiEngine implements ActionInterface
         }
 
         $requestContext = $request->getContext();
-        if ($requestContext instanceof HttpRequest) {
-            $method = $requestContext->getMethod();
+        if ($requestContext instanceof HttpRequestContext) {
+            $method = $requestContext->getRequest()->getMethod();
         } else {
             $method = 'POST';
         }
