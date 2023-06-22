@@ -49,9 +49,9 @@ use PSX\Http\MediaType;
  */
 class FcgiEngine implements ActionInterface
 {
-    protected ?string $host = null;
-    protected ?int $port = null;
-    protected ?string $script = null;
+    private ?string $host = null;
+    private ?int $port = null;
+    private ?string $script = null;
 
     private FactoryInterface $response;
 
