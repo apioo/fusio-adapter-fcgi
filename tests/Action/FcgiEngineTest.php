@@ -114,7 +114,7 @@ JSON;
         $this->assertEquals($expect, $actual, $actual);
     }
 
-    private function pingFastCGIServer()
+    private function pingFastCGIServer(): void
     {
         $handle = @stream_socket_client('tcp://127.0.0.1:9090', $errno, $errstr, 2);
         if (!$handle) {
