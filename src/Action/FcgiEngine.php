@@ -21,11 +21,13 @@
 
 namespace Fusio\Adapter\Fcgi\Action;
 
-use Fusio\Engine\ActionAbstract;
+use Fusio\Engine\Action\RuntimeInterface;
+use Fusio\Engine\ActionInterface;
 use Fusio\Engine\ContextInterface;
 use Fusio\Engine\ParametersInterface;
 use Fusio\Engine\Request\HttpRequest;
 use Fusio\Engine\RequestInterface;
+use Fusio\Engine\Response\FactoryInterface;
 use hollodotme\FastCGI\Client;
 use hollodotme\FastCGI\Requests\AbstractRequest;
 use hollodotme\FastCGI\Requests\DeleteRequest;
@@ -45,11 +47,18 @@ use PSX\Http\MediaType;
  * @license http://www.gnu.org/licenses/agpl-3.0
  * @link    https://www.fusio-project.org/
  */
-class FcgiEngine extends ActionAbstract
+class FcgiEngine implements ActionInterface
 {
     protected ?string $host = null;
     protected ?int $port = null;
     protected ?string $script = null;
+
+    private FactoryInterface $response;
+
+    public function __construct(RuntimeInterface $runtime)
+    {
+        $this->response = $runtime->getResponse();
+    }
 
     public function setHost(?string $host): void
     {
