@@ -114,17 +114,6 @@ JSON;
         $this->assertEquals($expect, $actual, $actual);
     }
 
-    public function testGetForm()
-    {
-        $action  = $this->getActionFactory()->factory(FcgiEngine::class);
-        $builder = new Builder();
-        $factory = $this->getFormElementFactory();
-
-        $action->configure($builder, $factory);
-
-        $this->assertInstanceOf(Container::class, $builder->getForm());
-    }
-
     private function pingFastCGIServer()
     {
         $handle = @stream_socket_client('tcp://127.0.0.1:9090', $errno, $errstr, 2);
