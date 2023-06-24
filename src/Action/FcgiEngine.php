@@ -168,7 +168,7 @@ class FcgiEngine implements ActionInterface
         $request->setContentType('application/json');
         $request->setRemoteAddress($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
         $request->setCustomVar('REMOTE_USER', $context->getUser()->getName());
-        $request->setCustomVar('ROUTE_ID', $context->getRouteId());
+        $request->setCustomVar('OPERATION_ID', $context->getOperationId());
         $request->setCustomVar('USER_ANONYMOUS', $context->getUser()->isAnonymous() ? '1' : '0');
         $request->setCustomVar('USER_ID', $context->getUser()->getId());
         $request->setCustomVar('APP_ID', $context->getApp()->getId());
