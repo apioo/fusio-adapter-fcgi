@@ -73,7 +73,7 @@ class FcgiEngineTest extends FcgiTestCase
         "CONTENT_TYPE": "application\/json",
         "REMOTE_ADDR": "127.0.0.1",
         "REMOTE_USER": "Consumer",
-        "ROUTE_ID": "34",
+        "OPERATION_ID": "34",
         "USER_ANONYMOUS": "0",
         "USER_ID": "2",
         "APP_ID": "3",
