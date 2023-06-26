@@ -51,7 +51,6 @@ abstract class FcgiTestCase extends TestCase
 
     protected function configure(Runtime $runtime, Container $container): void
     {
-        $container->set(FcgiEngine::class, new FcgiEngine($runtime));
         $container->set(FcgiProcessor::class, new FcgiProcessor($runtime));
     }
 }
