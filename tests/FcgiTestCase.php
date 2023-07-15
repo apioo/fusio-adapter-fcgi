@@ -21,22 +21,9 @@
 
 namespace Fusio\Adapter\Fcgi\Tests;
 
-use Fusio\Adapter\Aws\Action\AwsLambdaInvoke;
-use Fusio\Adapter\Aws\Connection\Aws;
-use Fusio\Adapter\Aws\Generator\AwsLambda;
-use Fusio\Adapter\Beanstalk\Action\BeanstalkPublish;
-use Fusio\Adapter\Beanstalk\Connection\Beanstalk;
-use Fusio\Adapter\Fcgi\Action\FcgiEngine;
-use Fusio\Adapter\Fcgi\Action\FcgiProcessor;
-use Fusio\Engine\Action\Runtime;
-use Fusio\Engine\ConnectorInterface;
-use Fusio\Engine\Model\Connection;
-use Fusio\Engine\Parameters;
-use Fusio\Engine\Test\CallbackConnection;
+use Fusio\Adapter\Fcgi\Adapter;
 use Fusio\Engine\Test\EngineTestCaseTrait;
-use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * FcgiTestCase
@@ -49,8 +36,8 @@ abstract class FcgiTestCase extends TestCase
 {
     use EngineTestCaseTrait;
 
-    protected function configure(Runtime $runtime, Container $container): void
+    protected function getAdapterClass(): string
     {
-        $container->set(FcgiProcessor::class, new FcgiProcessor($runtime));
+        return Adapter::class;
     }
 }
