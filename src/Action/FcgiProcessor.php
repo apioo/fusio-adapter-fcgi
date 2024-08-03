@@ -98,10 +98,8 @@ class FcgiProcessor extends ActionAbstract
         }
 
         $contentType = $headers['content-type'] ?? null;
-        if (!empty($contentType)) {
-            if ($this->isJson($contentType)) {
-                $body = \json_decode($body);
-            }
+        if ($this->isJson($contentType)) {
+            $body = \json_decode($body);
         }
 
         if (isset($headers['x-powered-by'])) {
@@ -120,11 +118,13 @@ class FcgiProcessor extends ActionAbstract
 
     private function isJson(?string $contentType): bool
     {
-        if (!empty($contentType)) {
-            try {
-                return MediaType\Json::isMediaType(MediaType::parse($contentType));
-            } catch (\InvalidArgumentException $e) {
-            }
+        if ($contentType === null || $contentType === '') {
+            return false;
+        }
+
+        try {
+            return MediaType\Json::isMediaType(MediaType::parse($contentType));
+        } catch (\InvalidArgumentException $e) {
         }
 
         return false;
