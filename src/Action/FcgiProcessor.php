@@ -38,6 +38,7 @@ use hollodotme\FastCGI\Requests\PutRequest;
 use hollodotme\FastCGI\SocketConnections;
 use PSX\Http\Environment\HttpResponseInterface;
 use PSX\Http\MediaType;
+use PSX\Json\Parser;
 
 /**
  * FcgiProcessor
@@ -80,7 +81,7 @@ class FcgiProcessor extends ActionAbstract
         }
 
         $client   = new Client();
-        $request  = $this->newRequest($method, $script, \json_encode($request->getPayload()), $context);
+        $request  = $this->newRequest($method, $script, Parser::encode($request->getPayload()), $context);
         $response = $client->sendRequest($connection, $request);
 
         $headers = $response->getHeaders();
