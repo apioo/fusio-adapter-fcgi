@@ -22,9 +22,11 @@ namespace Fusio\Adapter\Fcgi\Tests\Action;
 
 use Fusio\Adapter\Fcgi\Action\FcgiProcessor;
 use Fusio\Adapter\Fcgi\Tests\FcgiTestCase;
+use Fusio\Engine\ConfigurableInterface;
 use Fusio\Engine\Form\Builder;
 use Fusio\Engine\Form\Container;
 use PSX\Http\Environment\HttpResponseInterface;
+use PSX\Json\Parser;
 use PSX\Record\Record;
 
 /**
@@ -36,7 +38,7 @@ use PSX\Record\Record;
  */
 class FcgiProcessorTest extends FcgiTestCase
 {
-    public function testHandle()
+    public function testHandle(): void
     {
         $this->pingFastCGIServer();
 
@@ -50,8 +52,8 @@ class FcgiProcessorTest extends FcgiTestCase
             $this->getContext()
         );
 
-        $actual = json_encode($response->getBody(), JSON_PRETTY_PRINT);
-        $script = json_encode($script);
+        $actual = Parser::encode($response->getBody(), JSON_PRETTY_PRINT);
+        $script = Parser::encode($script);
         $expect = <<<JSON
 {
     "foo": "bar",
@@ -78,7 +80,7 @@ JSON;
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
 
-    public function testHandlePost()
+    public function testHandlePost(): void
     {
         $this->pingFastCGIServer();
 
@@ -92,8 +94,8 @@ JSON;
             $this->getContext()
         );
 
-        $actual = json_encode($response->getBody(), JSON_PRETTY_PRINT);
-        $script = json_encode($script);
+        $actual = Parser::encode($response->getBody(), JSON_PRETTY_PRINT);
+        $script = Parser::encode($script);
         $expect = <<<JSON
 {
     "foo": "bar",
@@ -122,7 +124,7 @@ JSON;
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
 
-    public function testHandleHtml()
+    public function testHandleHtml(): void
     {
         $this->pingFastCGIServer();
 
@@ -145,18 +147,20 @@ JSON;
         $this->assertEquals($expect, $actual, $actual);
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $action  = $this->getActionFactory()->factory(FcgiProcessor::class);
         $builder = new Builder();
         $factory = $this->getFormElementFactory();
+
+        $this->assertInstanceOf(ConfigurableInterface::class, $action);
 
         $action->configure($builder, $factory);
 
         $this->assertInstanceOf(Container::class, $builder->getForm());
     }
 
-    private function pingFastCGIServer()
+    private function pingFastCGIServer(): void
     {
         $handle = @stream_socket_client('tcp://127.0.0.1:9090', $errno, $errstr, 2);
         if (!$handle) {
